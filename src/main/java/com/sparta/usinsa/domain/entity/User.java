@@ -29,15 +29,24 @@ public class User extends TimeStamped {
   @Column(nullable = false)
   private String name;
 
+  private String brand;
+
   @Column(nullable = false)
   @Enumerated(value = EnumType.STRING)
   private UserType type;
 
   @Builder
-  public User(String email, String password, String name, UserType type) {
+  public User(String email, String password, String name, String brand, UserType type) {
+    if (type == UserType.OWNER && (brand == null || brand.isBlank())) {
+      throw new IllegalArgumentException("OWNER는 브랜드명을 필수로 입력해야 합니다.");
+    }
+    if (type != UserType.OWNER && brand != null) {
+      throw new IllegalArgumentException("USER는 브랜드명을 가질 수 없습니다.");
+    }
     this.email = email;
     this.password = password;
     this.name = name;
+    this.brand = brand;
     this.type = type;
   }
 
@@ -45,8 +54,8 @@ public class User extends TimeStamped {
     this.name = name;
   }
 
-  public void updatePassword(Long reqUserId, String currentPassword, String changePassword, PasswordEncoder passwordEncoder) {
-    validateUserIdentity(reqUserId);
+  public void updatePassword(Long requestUserId, String currentPassword, String changePassword, PasswordEncoder passwordEncoder) {
+    validateUserIdentity(requestUserId);
 
     if(!passwordEncoder.matches(currentPassword, this.getPassword())) {
       throw new RuntimeException("비밀번호가 틀렸습니다.");
@@ -63,9 +72,26 @@ public class User extends TimeStamped {
     super.delete();
   }
 
-  public void validateUserIdentity(Long reqUserId) {
-    if (!this.id.equals(reqUserId)) {
+  public void authenticate(String requestPassword, PasswordEncoder passwordEncoder) {
+    if(this.getDeletedAt() != null) {
+      throw new RuntimeException("탈퇴한 회원입니다.");
+    }
+    if(!passwordEncoder.matches(requestPassword, this.getPassword())) {
+      throw new RuntimeException("아이디 또는 비밀번호가 일치하지 않습니다.");
+    }
+  }
+
+  public void validateUserIdentity(Long requestUserId) {
+    if (!this.id.equals(requestUserId)) {
       throw new RuntimeException("본인이 아닌 사용자입니다.");
+    }
+  }
+
+  public boolean isOwner() { return this.type == UserType.OWNER; }
+
+  public void validateUserPassword(String requestPassword, PasswordEncoder passwordEncoder) {
+    if(!passwordEncoder.matches(requestPassword, this.getPassword())) {
+      throw new RuntimeException("현재 비밀번호가 일치하지 않습니다.");
     }
   }
 }
