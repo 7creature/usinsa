@@ -6,83 +6,83 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
+import lombok.Getter;
 
+@Getter
 @Entity
 public class Product {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
-
   private String name;
   private Long price;
   private String description;
   private String productUrl;
   private String category;
 
-  protected Product() {
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private User user;
+
+  private LocalDateTime createdAt;
+  private LocalDateTime modifiedAt;
+
+  public Product() {
   }
 
 
   public Product(
-      User user,
+      Long id,
       String name,
       Long price,
       String description,
       String productUrl,
-      String category) {
+      String category,
+      User user) {
 
+    this.id = id;
+    this.name = name;
+    this.price = price;
+    this.description = description;
+    this.productUrl = productUrl;
+    this.category = category;
     this.user = user;
-    this.name = name;
-    this.price = price;
-    this.description = description;
-    this.productUrl = productUrl;
-    this.category = category;
-  }
-  
-  public Long getId() {
-    return id;
   }
 
-  public User getUser() {
-    return user;
-  }
 
-  public String getName() {
-    return name;
-  }
-
-  public Long getPrice() {
-    return price;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public String getProductUrl() {
-    return productUrl;
-  }
-
-  public String getCategory() {
-    return category;
-  }
-
-  public void updateProduct(
+  public Product(
       String name,
       Long price,
       String description,
       String productUrl,
-      String category) {
-
+      String category,
+      User user) {
     this.name = name;
     this.price = price;
     this.description = description;
     this.productUrl = productUrl;
     this.category = category;
+    this.user = user;
+  }
+
+
+  public Product update(
+      String name,
+      Long price,
+      String description,
+      String productUrl,
+      String category,
+      User user) {
+
+    return new Product(
+        this.id,
+        name,
+        price,
+        description,
+        productUrl,
+        category,
+        user);
   }
 }
