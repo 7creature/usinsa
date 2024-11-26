@@ -1,6 +1,7 @@
 package com.sparta.usinsa.presentation.auth.dto.request;
 
 
+import com.sparta.usinsa.domain.entity.User;
 import com.sparta.usinsa.presentation.auth.UserType;
 import com.sparta.usinsa.presentation.common.annotation.ValidEnum;
 import com.sparta.usinsa.presentation.common.annotation.ValidPasswordPatten;
@@ -10,6 +11,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @NoArgsConstructor
@@ -55,5 +57,16 @@ public class AuthSignUpRequestDto {
     if (!isOwner() && brand != null && !brand.isBlank()) {
       throw new IllegalArgumentException("USER는 브랜드명을 가질 수 없습니다.");
     }
+  }
+
+  // AuthSignUpRequestDto -> User 엔티티로 변환
+  public User toEntity(PasswordEncoder passwordEncoder) {
+    return User.builder()
+        .email(this.email)
+        .password(passwordEncoder.encode(this.password))  // 비밀번호 암호화
+        .name(this.name)
+        .type(UserType.valueOf(this.type))  // 타입은 UserType enum으로 변환
+        .brand(this.brand)
+        .build();
   }
 }

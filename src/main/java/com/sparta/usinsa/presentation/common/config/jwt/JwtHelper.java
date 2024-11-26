@@ -1,83 +1,83 @@
 package com.sparta.usinsa.presentation.common.config.jwt;
 
-
-import com.sparta.usinsa.presentation.auth.UserType;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
+import com.sparta.usinsa.domain.entity.User;
+import com.sparta.usinsa.presentation.common.exception.CustomException;
+import com.sparta.usinsa.domain.repository.UserRepository;
+import io.jsonwebtoken.*;
+import java.util.Base64;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-@Slf4j(topic = "JWT Helper : ")
 @Component
 public class JwtHelper {
-  @Value("${jwt.secret.key}")
-  private String secretKey;
 
-  @Value("${token-expires-in}")
-  private long expiresIn;
+  private final String secretKey = "omj5JRxN5jN3NgELiMGihnSSyfEOeYgnxZY11YWHPqHb6/Lf/6VYB9VMhb7Tia2q4eyNWUNiCf8ZMSGRg==";
+  private final long accessTokenExpiration = 1000L * 60 * 30;  // 30 minutes
+  private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7;  // 7 days
 
-  private Key key;
+  private final UserRepository userRepository;
 
-  private static final String AUTHORIZATION_HEADER = "Authorization";
-  private static final String BEARER_PREFIX = "Bearer ";
-
-  @PostConstruct
-  public void init() {
-    key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+  // 생성자 주입
+  public JwtHelper(UserRepository userRepository) {
+    this.userRepository = userRepository;
   }
 
-  public String generateAccessToken(Long userId, String email, UserType userType) {
-    return BEARER_PREFIX
-        + Jwts.builder()
-        .setSubject(userId.toString())
-        .claim("email", email)
-        .claim("userType", userType)
-        .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + expiresIn))
-        .signWith(key, SignatureAlgorithm.HS256)
+  public String createAccessToken(User user) {
+    return Jwts.builder()
+        .setSubject(String.valueOf(user.getId()))
+        .setIssuedAt(new Date())
+        .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
+        .signWith(SignatureAlgorithm.HS256, secretKey)
         .compact();
   }
 
-  // HttpServletResponse Cookie 에 토큰삽입 후 전달.
-  public void addTokenToCookie(HttpServletResponse response, String token) {
-    try {
-      token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
-
-      Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
-      cookie.setPath("/");
-      response.addCookie(cookie);
-    } catch (UnsupportedEncodingException e) {
-      log.error(e.getMessage());
-      throw new RuntimeException("서버 오류가 발생했습니다.");
-    }
+  public String createRefreshToken(User user) {
+    return Jwts.builder()
+        .setSubject(String.valueOf(user.getId()))
+        .setIssuedAt(new Date())
+        .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+        .signWith(SignatureAlgorithm.HS256, secretKey)
+        .compact();
   }
 
-  public void validate(String accessToken) {
-    try {
-      Jwts.parserBuilder()
-          .setSigningKey(key)
-          .build()
-          .parseClaimsJws(accessToken)
-          .getBody()
-          .getSubject();
-    } catch (JwtException e) {
-      throw new RuntimeException("유효하지 않은 로그인 토큰 입니다.");
-    }
+  public String createAccessTokenFromRefreshToken(String refreshToken) {
+    Claims claims = validate(refreshToken);
+    // claims.getSubject()가 email이라 가정하고 조회
+    User user = userRepository.findByEmail(claims.getSubject())
+        .orElseThrow(() -> new CustomException("USER_NOT_FOUND", HttpStatus.NOT_FOUND));
+
+    return createAccessToken(user);
   }
 
   public Claims getUserInfoFromToken(String token) {
-    return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    return Jwts.parserBuilder()
+        .setSigningKey(secretKey)
+        .build()
+        .parseClaimsJws(token)
+        .getBody();
+  }
+
+  public Claims validate(String token) {
+    try {
+      return Jwts.parserBuilder()
+          .setSigningKey(secretKey)
+          .build()
+          .parseClaimsJws(token)
+          .getBody();
+    } catch (JwtException | IllegalArgumentException e) {
+      throw new CustomException("INVALID_TOKEN", HttpStatus.UNAUTHORIZED);
+    }
+  }
+
+  public void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+    Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
+    refreshTokenCookie.setHttpOnly(true);
+    refreshTokenCookie.setSecure(true);  // HTTPS를 사용하는 경우
+    refreshTokenCookie.setMaxAge((int) (refreshTokenExpiration / 1000)); // 쿠키 만료 시간 설정
+    refreshTokenCookie.setPath("/");
+    response.addCookie(refreshTokenCookie);
   }
 }

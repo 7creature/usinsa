@@ -1,13 +1,19 @@
 package com.sparta.usinsa.domain.entity;
 
 import com.sparta.usinsa.presentation.auth.UserType;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -54,16 +60,8 @@ public class User extends TimeStamped {
     this.name = name;
   }
 
-  public void updatePassword(Long requestUserId, String currentPassword, String changePassword, PasswordEncoder passwordEncoder) {
-    validateUserIdentity(requestUserId);
-
-    if(!passwordEncoder.matches(currentPassword, this.getPassword())) {
-      throw new RuntimeException("비밀번호가 틀렸습니다.");
-    }
-    if(!passwordEncoder.matches(changePassword, this.getPassword())) {
-      throw new RuntimeException("현재 사용중인 비밀 번호입니다.");
-    }
-    this.password = passwordEncoder.encode(changePassword);
+  public void updatePassword(String password) {
+    this.password = password;
   }
 
   @Override
@@ -72,26 +70,7 @@ public class User extends TimeStamped {
     super.delete();
   }
 
-  public void authenticate(String requestPassword, PasswordEncoder passwordEncoder) {
-    if(this.getDeletedAt() != null) {
-      throw new RuntimeException("탈퇴한 회원입니다.");
-    }
-    if(!passwordEncoder.matches(requestPassword, this.getPassword())) {
-      throw new RuntimeException("아이디 또는 비밀번호가 일치하지 않습니다.");
-    }
-  }
-
-  public void validateUserIdentity(Long requestUserId) {
-    if (!this.id.equals(requestUserId)) {
-      throw new RuntimeException("본인이 아닌 사용자입니다.");
-    }
-  }
-
-  public boolean isOwner() { return this.type == UserType.OWNER; }
-
-  public void validateUserPassword(String requestPassword, PasswordEncoder passwordEncoder) {
-    if(!passwordEncoder.matches(requestPassword, this.getPassword())) {
-      throw new RuntimeException("현재 비밀번호가 일치하지 않습니다.");
-    }
+  public boolean isDeleted() {
+    return this.getDeletedAt() != null;
   }
 }
