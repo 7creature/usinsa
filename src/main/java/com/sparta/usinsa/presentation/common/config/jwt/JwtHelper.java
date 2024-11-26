@@ -15,8 +15,8 @@ import java.util.Date;
 public class JwtHelper {
 
   private final String secretKey = "omj5JRxN5jN3NgELiMGihnSSyfEOeYgnxZY11YWHPqHb6/Lf/6VYB9VMhb7Tia2q4eyNWUNiCf8ZMSGRg==";
-  private final long accessTokenExpiration = 1000L * 60 * 30;  // 30 minutes
-  private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7;  // 7 days
+  private final long accessTokenExpiration = 1000L * 60 * 30;
+  private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7;
 
   private final UserRepository userRepository;
 

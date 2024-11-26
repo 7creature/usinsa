@@ -31,7 +31,8 @@ public class AuthService {
     User user = authSignUpRequestDto.toEntity(passwordEncoder);
     userRepository.save(user);
     // 회원가입 후 자동 로그인 처리
-    AuthSignInRequestDto authSignInRequestDto = new AuthSignInRequestDto(authSignUpRequestDto.getEmail(), authSignUpRequestDto.getPassword());
+    AuthSignInRequestDto authSignInRequestDto = new AuthSignInRequestDto(
+        authSignUpRequestDto.getEmail(), authSignUpRequestDto.getPassword());
     signin(authSignInRequestDto, response);
   }
 
@@ -63,10 +64,10 @@ public class AuthService {
   }
 
   public void authenticate(User user, String requestPassword, PasswordEncoder passwordEncoder) {
-    if(user.isDeleted()) {
+    if (user.isDeleted()) {
       throw new CustomException("탈퇴한 회원입니다.", HttpStatus.BAD_REQUEST);
     }
-    if(!passwordEncoder.matches(requestPassword, user.getPassword())) {
+    if (!passwordEncoder.matches(requestPassword, user.getPassword())) {
       throw new CustomException("아이디 또는 비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
     }
   }
