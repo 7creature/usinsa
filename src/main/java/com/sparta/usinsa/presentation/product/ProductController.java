@@ -2,8 +2,9 @@ package com.sparta.usinsa.presentation.product;
 
 import com.sparta.usinsa.application.service.ProductService;
 import com.sparta.usinsa.domain.entity.Product;
-import com.sparta.usinsa.presentation.product.dto.request.ProductRequestDto;
-import com.sparta.usinsa.presentation.product.dto.response.ProductResponseDto;
+import com.sparta.usinsa.domain.entity.User;
+import com.sparta.usinsa.presentation.product.dto.ProductRequestDto;
+import com.sparta.usinsa.presentation.product.dto.ProductResponseDto;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +24,34 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController {
 
   private final ProductService productService;
+  private final UserService userService;
 
   @Autowired
-  public ProductController(ProductService productService) {
+  public ProductController(ProductService productService, UserService userService) {
     this.productService = productService;
+    this.userService = userService;
   }
 
   // 상품 등록
   @PostMapping
   public ResponseEntity<ProductResponseDto> addProduct(
       @RequestBody ProductRequestDto productRequestDto) {
-    Product savedProduct = productService.addProduct(productRequestDto);
+
+    User user = userService.getUserById(productRequestDto.getUserId());
+
+    // Product 객체 생성
+    Product product = new Product(
+        productRequestDto.getName(),
+        productRequestDto.getPrice(),
+        productRequestDto.getDescription(),
+        productRequestDto.getProductUrl(),
+        productRequestDto.getCategory(),
+        user // User를 함께 저장
+    );
+
+    // Product 저장
+    Product savedProduct = productService.addProduct(product);
+
     return ResponseEntity.status(HttpStatus.CREATED).body(new ProductResponseDto(savedProduct));
   }
 
@@ -57,10 +75,12 @@ public class ProductController {
   // 상품 수정
   @PutMapping("/{id}")
   public ResponseEntity<ProductResponseDto> updateProduct(
-      @PathVariable Long id,
-      @RequestBody ProductRequestDto productRequestDto) {
+      @PathVariable Long id, @RequestBody ProductRequestDto productRequestDto) {
 
-    Product updatedProduct = productService.updateProduct(id, productRequestDto);
+    User user = userService.getUserById(productRequestDto.getUserId());
+    
+    Product updatedProduct = productService.updateProduct(id, productRequestDto, user);
+
     return ResponseEntity.ok(new ProductResponseDto(updatedProduct));
   }
 
