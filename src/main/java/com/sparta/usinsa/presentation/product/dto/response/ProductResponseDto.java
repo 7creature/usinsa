@@ -1,10 +1,15 @@
 package com.sparta.usinsa.presentation.product.dto.response;
 
 import com.sparta.usinsa.domain.entity.Product;
+import com.sparta.usinsa.domain.entity.User;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
 public class ProductResponseDto {
 
   private Long id;
@@ -15,6 +20,7 @@ public class ProductResponseDto {
   private String category;
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
+  private User userid;
 
 
   public ProductResponseDto(Product product) {
@@ -26,38 +32,7 @@ public class ProductResponseDto {
     this.category = product.getCategory();
     this.createdAt = product.getCreatedAt();
     this.modifiedAt = product.getModifiedAt();
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public Long getPrice() {
-    return price;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public String getProductUrl() {
-    return productUrl;
-  }
-
-  public String getCategory() {
-    return category;
-  }
-
-  public LocalDateTime getCreatedAt() {
-    return createdAt;
-  }
-
-  public LocalDateTime getModifiedAt() {
-    return modifiedAt;
+    this.userid = product.getUser();
   }
 
 

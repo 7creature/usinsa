@@ -3,8 +3,11 @@ package com.sparta.usinsa.application.service;
 import com.sparta.usinsa.domain.entity.Product;
 import com.sparta.usinsa.domain.entity.User;
 import com.sparta.usinsa.domain.repository.ProductRepository;
+import com.sparta.usinsa.domain.repository.UserRepository;
 import com.sparta.usinsa.presentation.common.exception.CustomException;
-import com.sparta.usinsa.presentation.product.dto.ProductRequestDto;
+import com.sparta.usinsa.presentation.product.dto.request.ProductRequestDto;
+import com.sparta.usinsa.presentation.product.dto.response.ProductResponseDto;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,11 +16,11 @@ import org.springframework.stereotype.Service;
 public class ProductService {
 
   private final ProductRepository productRepository;
-  private final UserService userService;
+  private final UserRepository userRepository;
 
-  public ProductService(ProductRepository productRepository, UserService userService) {
+  public ProductService(ProductRepository productRepository, UserRepository userRepository) {
     this.productRepository = productRepository;
-    this.userService = userService;
+    this.userRepository = userRepository;
   }
 
   // 상품 단건 조회 (Read)
@@ -32,12 +35,8 @@ public class ProductService {
   }
 
   // 상품 등록 (Create)
-  public Product addProduct(ProductRequestDto productRequestDto) {
-    User user = userService.getUserById(productRequestDto.getUserId());
-    if (user == null) {
-      throw new CustomException("사용자를 찾을 수 없습니다. ID: " + productRequestDto.getUserId(),
-          HttpStatus.NOT_FOUND);
-    }
+  @Transactional
+  public ProductResponseDto addProduct(ProductRequestDto productRequestDto, User user) {
 
     // Product 객체 생성
     Product product = new Product(
@@ -50,33 +49,35 @@ public class ProductService {
     );
 
     // 상품 저장
-    return productRepository.save(product);
+    return new ProductResponseDto(productRepository.save(product));
   }
 
   // 상품 수정 (Update)
+  @Transactional
   public Product updateProduct(Long id, ProductRequestDto productRequestDto) {
     // 기존 상품 조회
     Product existingProduct = productRepository.findById(id)
         .orElseThrow(() -> new CustomException("상품을 찾을 수 없습니다. ID: " + id, HttpStatus.NOT_FOUND));
 
-    // 사용자 정보 조회
-    User user = userService.getUserById(productRequestDto.getUserId());
-    if (user == null) {
-      throw new CustomException("사용자를 찾을 수 없습니다. ID: " + productRequestDto.getUserId(),
-          HttpStatus.NOT_FOUND);
-    }
+    // 사용자 정보 직접 조회
+    User user = userRepository.findById(productRequestDto.getUserId())
+        .orElseThrow(
+            () -> new CustomException("사용자를 찾을 수 없습니다. ID: " + productRequestDto.getUserId(),
+                HttpStatus.NOT_FOUND));
 
-    existingProduct.setName(productRequestDto.getName());
-    existingProduct.setPrice(productRequestDto.getPrice());
-    existingProduct.setDescription(productRequestDto.getDescription());
-    existingProduct.setProductUrl(productRequestDto.getProductUrl());
-    existingProduct.setCategory(productRequestDto.getCategory());
-    existingProduct.setUser(user);
-
-    return productRepository.save(existingProduct);
+    // 기존 객체를 수정하는 대신, 새로운 객체를 생성해서 반환
+    return existingProduct.update(
+        productRequestDto.getName(),
+        productRequestDto.getPrice(),
+        productRequestDto.getDescription(),
+        productRequestDto.getProductUrl(),
+        productRequestDto.getCategory(),
+        user
+    );
   }
 
   // 상품 삭제 (Delete)
+  @Transactional
   public void deleteProduct(Long id) {
     if (!productRepository.existsById(id)) {
       throw new CustomException("상품을 찾을 수 없습니다. ID: " + id, HttpStatus.NOT_FOUND);

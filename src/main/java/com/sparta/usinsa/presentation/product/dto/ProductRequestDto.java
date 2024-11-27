@@ -19,7 +19,8 @@ public class ProductRequestDto {
       Long price,
       String description,
       String productUrl,
-      String category) {
+      String category
+  ) {
 
     this.name = name;
     this.price = price;

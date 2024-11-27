@@ -3,11 +3,12 @@ package com.sparta.usinsa.presentation.product;
 import com.sparta.usinsa.application.service.ProductService;
 import com.sparta.usinsa.domain.entity.Product;
 import com.sparta.usinsa.domain.entity.User;
-import com.sparta.usinsa.presentation.product.dto.ProductRequestDto;
-import com.sparta.usinsa.presentation.product.dto.ProductResponseDto;
+import com.sparta.usinsa.presentation.common.annotation.AuthUser;
+import com.sparta.usinsa.presentation.product.dto.request.ProductRequestDto;
+import com.sparta.usinsa.presentation.product.dto.response.ProductResponseDto;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,38 +22,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/products")
+@RequiredArgsConstructor
 public class ProductController {
 
   private final ProductService productService;
-  private final UserService userService;
-
-  @Autowired
-  public ProductController(ProductService productService, UserService userService) {
-    this.productService = productService;
-    this.userService = userService;
-  }
 
   // 상품 등록
   @PostMapping
   public ResponseEntity<ProductResponseDto> addProduct(
-      @RequestBody ProductRequestDto productRequestDto) {
-
-    User user = userService.getUserById(productRequestDto.getUserId());
+      @RequestBody ProductRequestDto productRequestDto, @AuthUser User user) {
 
     // Product 객체 생성
-    Product product = new Product(
-        productRequestDto.getName(),
-        productRequestDto.getPrice(),
-        productRequestDto.getDescription(),
-        productRequestDto.getProductUrl(),
-        productRequestDto.getCategory(),
-        user // User를 함께 저장
-    );
+    ProductResponseDto product = productService.addProduct(productRequestDto, user);
 
     // Product 저장
-    Product savedProduct = productService.addProduct(product);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(new ProductResponseDto(savedProduct));
+    return ResponseEntity.status(HttpStatus.CREATED).body(product);
   }
 
   // 상품 단건 조회
@@ -74,12 +58,10 @@ public class ProductController {
 
   // 상품 수정
   @PutMapping("/{id}")
-  public ResponseEntity<ProductResponseDto> updateProduct(
-      @PathVariable Long id, @RequestBody ProductRequestDto productRequestDto) {
+  public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable Long id,
+      @RequestBody ProductRequestDto productRequestDto) {
 
-    User user = userService.getUserById(productRequestDto.getUserId());
-    
-    Product updatedProduct = productService.updateProduct(id, productRequestDto, user);
+    Product updatedProduct = productService.updateProduct(id, productRequestDto);
 
     return ResponseEntity.ok(new ProductResponseDto(updatedProduct));
   }
