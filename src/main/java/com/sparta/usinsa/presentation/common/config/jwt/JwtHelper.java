@@ -1,28 +1,34 @@
 package com.sparta.usinsa.presentation.common.config.jwt;
 
 import com.sparta.usinsa.domain.entity.User;
-import com.sparta.usinsa.presentation.common.exception.CustomException;
 import com.sparta.usinsa.domain.repository.UserRepository;
-import io.jsonwebtoken.*;
-import java.util.Base64;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
+import com.sparta.usinsa.presentation.common.exception.CustomException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.Optional;
+import javax.crypto.SecretKey;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtHelper {
 
-  private final String secretKey = "omj5JRxN5jN3NgELiMGihnSSyfEOeYgnxZY11YWHPqHb6/Lf/6VYB9VMhb7Tia2q4eyNWUNiCf8ZMSGRg==";
   private final long accessTokenExpiration = 1000L * 60 * 30;
   private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7;
 
+  private final SecretKey secretKey;
   private final UserRepository userRepository;
 
   // 생성자 주입
   public JwtHelper(UserRepository userRepository) {
     this.userRepository = userRepository;
+    this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
   }
 
   public String createAccessToken(User user) {
@@ -52,12 +58,23 @@ public class JwtHelper {
     return createAccessToken(user);
   }
 
-  public Claims getUserInfoFromToken(String token) {
+  public Claims getClaims(String token) {
+    if (token.startsWith("Bearer ")) {
+      token = token.substring(7);
+    }
     return Jwts.parserBuilder()
         .setSigningKey(secretKey)
         .build()
         .parseClaimsJws(token)
         .getBody();
+  }
+
+  public User getUserIdFromToken(String token) {
+    Claims claims = getClaims(token);
+    String sub = claims.getSubject();
+    Long userId = Long.parseLong(sub);
+    Optional<User> byId = userRepository.findById(userId);
+    return byId.get();
   }
 
   public Claims validate(String token) {
