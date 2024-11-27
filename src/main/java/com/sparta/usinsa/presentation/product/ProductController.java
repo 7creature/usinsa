@@ -59,9 +59,9 @@ public class ProductController {
   // 상품 수정
   @PutMapping("/{id}")
   public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable Long id,
-      @RequestBody ProductRequestDto productRequestDto) {
+      @RequestBody ProductRequestDto productRequestDto, @AuthUser User user) {
 
-    Product updatedProduct = productService.updateProduct(id, productRequestDto);
+    Product updatedProduct = productService.updateProduct(id, productRequestDto, user);
 
     return ResponseEntity.ok(new ProductResponseDto(updatedProduct));
   }

@@ -10,7 +10,6 @@ public class ProductRequestDto {
   private String description;
   private String productUrl;
   private String category;
-  private Long userId;
 
   public ProductRequestDto() {
   }
@@ -20,15 +19,14 @@ public class ProductRequestDto {
       Long price,
       String description,
       String productUrl,
-      String category,
-      Long userId) {
+      String category
+  ) {
 
     this.name = name;
     this.price = price;
     this.description = description;
     this.productUrl = productUrl;
     this.category = category;
-    this.userId = userId;
   }
 
 }
