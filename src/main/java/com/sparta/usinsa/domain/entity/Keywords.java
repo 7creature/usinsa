@@ -23,10 +23,9 @@ public class Keywords {
   private Long searchCount;
   private LocalDateTime lastSearched;
 
-  public Keywords(String keyword, Long searchCount, LocalDateTime lastSearched) {
+  public Keywords(String keyword, Long searchCount) {
     this.keyword = keyword;
     this.searchCount = searchCount;
-    this.lastSearched = lastSearched;
   }
 
 
