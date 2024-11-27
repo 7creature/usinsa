@@ -19,6 +19,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @EnableCaching
 public class RedisConfig {
+
   @Value("${spring.data.redis.port}")
   private int port;
 
@@ -48,6 +49,6 @@ public class RedisConfig {
             .disableCachingNullValues())// null값 캐싱하지 않음
         .transactionAware() // 트렌젝션과 함게 레디스 동작
         .build();
-
+    return cacheManager;
   }
 }
