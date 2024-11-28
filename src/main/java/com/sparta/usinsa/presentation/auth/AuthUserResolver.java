@@ -31,6 +31,11 @@ public class AuthUserResolver implements HandlerMethodArgumentResolver {
 
     Optional<Authentication> authentication = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
 
+    if (authentication.isPresent() && authentication.get().getPrincipal() instanceof UserPrincipal) {
+      UserPrincipal userPrincipal = (UserPrincipal) authentication.get().getPrincipal();
+      return userPrincipal.getUser();
+    }
+
     throw new IllegalStateException("인증 정보가 존재하지 않거나 올바르지 않습니다.");
   }
 }
