@@ -3,7 +3,6 @@ package com.sparta.usinsa.presentation.auth.dto.request;
 
 import com.sparta.usinsa.domain.entity.User;
 import com.sparta.usinsa.presentation.auth.UserType;
-import com.sparta.usinsa.presentation.common.PasswordEncoder;
 import com.sparta.usinsa.presentation.common.annotation.ValidEnum;
 import com.sparta.usinsa.presentation.common.annotation.ValidPasswordPatten;
 import jakarta.validation.constraints.Email;
@@ -12,6 +11,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 
 @Getter
