@@ -1,22 +1,21 @@
 package com.sparta.usinsa.domain.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.Getter;
 
+@Getter
 @Entity
-public class Product {
+public class Product extends TimeStamped {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @ManyToOne
-  @JoinColumn(name = "user_id")
-  private User user;
 
   private String name;
   private Long price;
@@ -24,65 +23,46 @@ public class Product {
   private String productUrl;
   private String category;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
+
   protected Product() {
   }
 
-
   public Product(
-      User user,
       String name,
       Long price,
       String description,
       String productUrl,
-      String category) {
+      String category,
+      User user) {
 
+    this.name = name;
+    this.price = price;
+    this.description = description;
+    this.productUrl = productUrl;
+    this.category = category;
     this.user = user;
-    this.name = name;
-    this.price = price;
-    this.description = description;
-    this.productUrl = productUrl;
-    this.category = category;
-  }
-  
-  public Long getId() {
-    return id;
   }
 
-  public User getUser() {
-    return user;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public Long getPrice() {
-    return price;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public String getProductUrl() {
-    return productUrl;
-  }
-
-  public String getCategory() {
-    return category;
-  }
-
-  public void updateProduct(
+  // 상품 수정 메서드
+  public Product update(
       String name,
       Long price,
       String description,
       String productUrl,
-      String category) {
+      String category,
+      User user) {
 
     this.name = name;
     this.price = price;
     this.description = description;
     this.productUrl = productUrl;
     this.category = category;
+    this.user = user;
+
+    return this;
   }
+
 }
