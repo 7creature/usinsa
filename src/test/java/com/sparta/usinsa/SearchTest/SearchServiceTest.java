@@ -76,7 +76,7 @@ public class SearchServiceTest {
         .build();
 
     Product product = new Product(
-        user, "따듯한 패딩", 1000L, "따숩다", "test", "패딩");
+        "따듯한 패딩", 1000L, "따숩다", "test", "패딩", user);
 
     Field idField = Product.class.getDeclaredField("id");
     idField.setAccessible(true);
