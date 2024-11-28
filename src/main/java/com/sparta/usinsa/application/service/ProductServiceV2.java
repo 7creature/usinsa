@@ -33,10 +33,13 @@ public class ProductServiceV2 {
       return; // 이미 조회한 사용자라면 조회수를 증가시키지 않음
     }
 
+    // db 에 조회수 저장
     Product product = productRepository.findById(productId)
         .orElseThrow(() -> new CustomException("해당 상품은 존재하지 않습니다.", HttpStatus.BAD_REQUEST));
+    product.setIncreaseViewCount(1L);
+    productRepository.save(product);
 
-    // 조회수 증가
+    // 조회수 증가 redis
     redisTemplate.opsForValue().increment(viewCountKey, 1);
 
     // 중복 조회 방지를 위한 사용자 키 설정 (1시간 유지)
@@ -48,9 +51,21 @@ public class ProductServiceV2 {
 
   // 조회수 가져오기
   public Long getProductViewCount(Long productId) {
-    String viewCountKey = VIEW_COUNT_KEY + productId;
-    String count = redisTemplate.opsForValue().get(viewCountKey);
-    return count == null ? 0L : Long.parseLong(count);
+    final String viewCountKey = VIEW_COUNT_KEY + productId;
+
+    // redis 조회
+    final String redisCount = redisTemplate.opsForValue().get(viewCountKey);
+    if(redisCount != null){
+      return Long.parseLong(redisCount);
+    }
+
+    // db 조회
+    Product product = productRepository.findById(productId)
+        .orElseThrow(() -> new CustomException("해당 상품이 존재하지 않습니다.", HttpStatus.BAD_REQUEST));
+
+    redisTemplate.opsForValue().set(viewCountKey, String.valueOf(product.getViewCount()), 10, TimeUnit.MINUTES);
+
+    return product.getViewCount();
   }
 
   // 조회수 랭킹 가져오기
