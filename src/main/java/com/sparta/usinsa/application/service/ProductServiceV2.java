@@ -36,16 +36,24 @@ public class ProductServiceV2 {
     redisTemplate.opsForZSet().incrementScore(TOP_PRODUCTS_KEY, productId.toString(), 1);
   }
 
+  // 조회수 가져오기
   public Long getProductViewCount(Long productId) {
     String viewCountKey = VIEW_COUNT_KEY + productId;
     String count = redisTemplate.opsForValue().get(viewCountKey);
     return count == null ? 0L : Long.parseLong(count);
   }
 
+  // 조회수 랭킹 가져오기
   public Set<String> getTopRankedProducts(int limit) {
+    return redisTemplate.opsForZSet()
+        .reverseRange(TOP_PRODUCTS_KEY, 0, limit - 1);
   }
 
+  // 자정에 조회수 리셋
   public void resetViewCounts() {
-
+    Set<String> keys = redisTemplate.keys(VIEW_COUNT_KEY + "*");
+    if (keys != null && !keys.isEmpty()) {
+      redisTemplate.delete(keys);
+    }
   }
 }
