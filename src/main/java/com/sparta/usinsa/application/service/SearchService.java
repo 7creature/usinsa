@@ -57,6 +57,14 @@ public class SearchService {
             keyword.getSearchCount(), keyword.getLastSearched())).toList();
   }
 
+  public void deleteSearch(Long id) {
+    Optional<Keywords> keyword = keywordRepository.findById(id);
+    if (keyword.isPresent()) {
+      keywordRepository.deleteById(id);
+    }
+
+  }
+
   @Cacheable(value = SEARCH_KEY, key="'poplarSerchList'")
   public List<KeywordResponse> V2PopularSearch() {
     ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
@@ -101,4 +109,6 @@ public class SearchService {
       keywordRepository.save(newKeyword);
     }
   }
+
+
 }
