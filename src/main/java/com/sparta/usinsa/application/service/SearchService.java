@@ -8,16 +8,11 @@ import com.sparta.usinsa.presentation.search.dto.response.KeywordResponse;
 import com.sparta.usinsa.presentation.search.dto.response.SearchResponse;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +23,7 @@ public class SearchService {
 
   private final ProductRepository productRepository;
   private final KeywordRepository keywordRepository;
+
 
   private final RedisTemplate<String, Object> redisTemplate;
 
@@ -45,8 +41,12 @@ public class SearchService {
 
     popularKeyword(keyword);
 
-    return products.map(product -> new SearchResponse(product.getId(), product.getUser().getBrand(),
-        product.getName(), product.getPrice()));
+    return products
+        .map(product -> new SearchResponse(
+            product.getId(),
+            product.getUser().getBrand(),
+            product.getName(),
+            product.getPrice()));
   }
 
   public List<KeywordResponse> V1PopularSearch() {
@@ -96,6 +96,21 @@ public class SearchService {
       keywords.setSearchCount(score.longValue()); // 중복된 키워드 카운트
       keywords.setLastSearched(LocalDateTime.now());
     } else { // null이면 생성
+      Keywords newKeyword = new Keywords(keyword, 1L);
+      newKeyword.setLastSearched(LocalDateTime.now());
+      keywordRepository.save(newKeyword);
+    }
+  }
+  @Transactional
+  public void popularKeyword(String keyword) {
+    Optional<Keywords> optionalKeyword = keywordRepository.findByKeyword(keyword);
+    // Optional Wrapper 클레스로 null값 입력 방지
+
+    if (optionalKeyword.isPresent()) { // isPresent()으로 null값인지 확인
+      Keywords keywords = optionalKeyword.get();
+      keywords.setSearchCount(keywords.getSearchCount() + 1); // 중복된 키워드 카운트
+      keywords.setLastSearched(LocalDateTime.now());
+    }else { // null이면 생성
       Keywords newKeyword = new Keywords(keyword, 1L);
       newKeyword.setLastSearched(LocalDateTime.now());
       keywordRepository.save(newKeyword);

@@ -2,13 +2,11 @@ package com.sparta.usinsa.SearchTest;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sparta.usinsa.application.service.PopularKeywordService;
 import com.sparta.usinsa.application.service.SearchService;
 import com.sparta.usinsa.domain.entity.Keywords;
 import com.sparta.usinsa.domain.entity.Product;
@@ -26,10 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -40,7 +35,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
-
 public class SearchServiceTest {
 
   @Mock
@@ -49,15 +43,8 @@ public class SearchServiceTest {
   @Mock
   private KeywordRepository keywordRepository;
 
-  @Mock
-  @Qualifier("caffeineManager")
-  private CacheManager caffeineManager;
-
   @InjectMocks
   private SearchService searchService;
-
-  @InjectMocks
-  private PopularKeywordService popularKeywordService;
 
   @Test
   @DisplayName("키워드 검색 기능 테스트")
@@ -76,7 +63,7 @@ public class SearchServiceTest {
         .build();
 
     Product product = new Product(
-        user, "따듯한 패딩", 1000L, "따숩다", "test", "패딩");
+         "따듯한 패딩", 1000L, "따숩다", "test", "패딩",user);
 
     Field idField = Product.class.getDeclaredField("id");
     idField.setAccessible(true);
@@ -116,7 +103,7 @@ public class SearchServiceTest {
     when(keywordRepository.findByKeyword(keyword)).thenReturn(Optional.of(existingKeyword));
 
     // When
-    popularKeywordService.popularKeyword(keyword);
+    searchService.popularKeyword(keyword);
 
     // Then
     assertEquals(11L, existingKeyword.getSearchCount());
@@ -145,36 +132,4 @@ public class SearchServiceTest {
     assertEquals(100L, responses.get(0).getSearchCount());
     assertEquals("keyword3", responses.get(2).getKeyword());
   }
-
-  @Test
-  @DisplayName("카페인 로컬 캐시 작동 테스트")
-  void cacheableTest_success() {
-    // given
-    Keywords keyword1 = new Keywords("패딩", 100L);
-    keyword1.setId(1L);
-    Keywords keyword2 = new Keywords("코트", 90L);
-    keyword2.setId(2L);
-    List<Keywords> mockKeywords = List.of(keyword1, keyword2);
-
-    when(keywordRepository.findTop10ByOrderBySearchCountDesc()).thenReturn(mockKeywords);
-
-    // cache miss cache 생성
-    List<KeywordResponse> result1 = searchService.V2PopularSearch();
-    // cache 조회
-    List<KeywordResponse> result2 = searchService.V2PopularSearch();
-
-    assertNotNull(caffeineManager, "Caffeine CacheManager가 주입되지 않았습니다.");
-
-    // When
-    Cache cache = caffeineManager.getCache("popularSearch");
-    assertNotNull(cache);
-
-    // Then
-
-    assertNotNull(cache.get("list"));
-    List<KeywordResponse> cachedResponse = (List<KeywordResponse>) cache.get("list").get();
-    assertEquals(result1, cachedResponse);
-    verify(keywordRepository, times(1)).findTop10ByOrderBySearchCountDesc();
-  }
-
 }
