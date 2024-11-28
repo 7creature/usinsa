@@ -37,6 +37,9 @@ public class ProductServiceV2 {
   }
 
   public Long getProductViewCount(Long productId) {
+    String viewCountKey = VIEW_COUNT_KEY + productId;
+    String count = redisTemplate.opsForValue().get(viewCountKey);
+    return count == null ? 0L : Long.parseLong(count);
   }
 
   public Set<String> getTopRankedProducts(int limit) {
