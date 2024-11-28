@@ -2,13 +2,11 @@ package com.sparta.usinsa.SearchTest;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sparta.usinsa.application.service.PopularKeywordService;
 import com.sparta.usinsa.application.service.SearchService;
 import com.sparta.usinsa.domain.entity.Keywords;
 import com.sparta.usinsa.domain.entity.Product;
@@ -28,7 +26,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -72,7 +69,7 @@ public class SearchServiceTest {
         .build();
 
     Product product = new Product(
-        user, "따듯한 패딩", 1000L, "따숩다", "test", "패딩");
+         "따듯한 패딩", 1000L, "따숩다", "test", "패딩",user);
 
     Field idField = Product.class.getDeclaredField("id");
     idField.setAccessible(true);
