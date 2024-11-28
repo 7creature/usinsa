@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class SearchController {
 
-  private SearchService searchService;
+  private final SearchService searchService;
 
   @GetMapping("/search")
   public ResponseEntity<Page<SearchResponse>> search(
@@ -30,14 +30,14 @@ public class SearchController {
         .body(searchService.searches(page,size,keyword));
   }
 
-  @GetMapping("/V1/search")
+  @GetMapping("/v1/search")
   public ResponseEntity<List<KeywordResponse>> V1PopularSearch(){
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(searchService.V1PopularSearch());
   }
 
-  @GetMapping("/V2/search")
+  @GetMapping("/v2/search")
   public ResponseEntity<List<KeywordResponse>> V2PopularSearch(){
     return ResponseEntity
         .status(HttpStatus.OK)
