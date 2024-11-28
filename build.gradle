@@ -54,7 +54,7 @@ dependencies {
 
     // 로컬 cache
     implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'org.ehcache:ehcache:3.9.8'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 }
 
 tasks.named('test') {
