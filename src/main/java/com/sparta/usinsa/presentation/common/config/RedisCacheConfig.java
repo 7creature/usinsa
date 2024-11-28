@@ -25,9 +25,6 @@ public class RedisCacheConfig {
   @Value("${spring.data.redis.host}")
   private String host;
 
-  @Value("${spring.data.redis.port}")
-  private int port;
-
   @Bean
   public LettuceConnectionFactory lettuceConnectionFactory() {
     return new LettuceConnectionFactory(new RedisStandaloneConfiguration(host, port));
