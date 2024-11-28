@@ -57,7 +57,7 @@ public class SearchService {
             keyword.getSearchCount(), keyword.getLastSearched())).toList();
   }
 
-  @Cacheable(value = SEARCH_KEY, key="'poplarSerchList'")
+  @Cacheable(value = SEARCH_KEY)
   public List<KeywordResponse> V2PopularSearch() {
     ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
 
