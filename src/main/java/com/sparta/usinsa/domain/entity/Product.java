@@ -1,5 +1,6 @@
 package com.sparta.usinsa.domain.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +27,13 @@ public class Product extends TimeStamped {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
+
+  @Column(nullable = false)
+  private Long viewCount = 0L;
+
+  public void setIncreaseViewCount(Long increaseViewCount) {
+    this.viewCount += increaseViewCount;
+  }
 
   protected Product() {
   }

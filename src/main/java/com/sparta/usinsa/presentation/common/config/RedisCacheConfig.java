@@ -25,6 +25,9 @@ public class RedisCacheConfig {
   @Value("${spring.data.redis.host}")
   private String host;
 
+  @Value("${spring.data.redis.port}")
+  private int port;
+
   @Bean
   public LettuceConnectionFactory lettuceConnectionFactory() {
     return new LettuceConnectionFactory(new RedisStandaloneConfiguration(host, port));
@@ -33,8 +36,22 @@ public class RedisCacheConfig {
   @Bean
   public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
     RedisTemplate<String, Object> template = new RedisTemplate<>();
+
+    // redis 연결
     template.setConnectionFactory(connectionFactory);
+
+    // 기본 직렬화
+    template.setDefaultSerializer(new StringRedisSerializer());
+
+    // key-value 직렬화
     template.setKeySerializer(new StringRedisSerializer());
+    template.setValueSerializer(new StringRedisSerializer());
+
+    // hash key-value 직렬화
+    template.setHashKeySerializer(new StringRedisSerializer());
+    template.setHashValueSerializer(new StringRedisSerializer());
+
+    // json 직렬화
     template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
     return template;
