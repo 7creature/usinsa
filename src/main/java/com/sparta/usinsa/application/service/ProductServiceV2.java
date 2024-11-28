@@ -1,10 +1,14 @@
 package com.sparta.usinsa.application.service;
 
+import com.sparta.usinsa.domain.entity.Product;
+import com.sparta.usinsa.domain.repository.ProductRepository;
+import com.sparta.usinsa.presentation.common.exception.CustomException;
 import jakarta.transaction.Transactional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,6 +16,8 @@ import org.springframework.stereotype.Service;
 public class ProductServiceV2 {
 
   private final StringRedisTemplate redisTemplate;
+  private final ProductRepository productRepository;
+
   private static final String VIEW_COUNT_KEY = "product:viewcount:";
   private static final String TOP_PRODUCTS_KEY = "product:top";
 
@@ -26,14 +32,17 @@ public class ProductServiceV2 {
       return; // 이미 조회한 사용자라면 조회수를 증가시키지 않음
     }
 
+    Product product = productRepository.findById(productId)
+        .orElseThrow(() -> new CustomException("해당 상품은 존재하지 않습니다.", HttpStatus.BAD_REQUEST));
+
     // 조회수 증가
-    redisTemplate.opsForValue().increment(viewCountKey);
+    redisTemplate.opsForValue().increment(viewCountKey, 1);
 
     // 중복 조회 방지를 위한 사용자 키 설정 (1시간 유지)
     redisTemplate.opsForValue().set(userViewKey, "1", 1, TimeUnit.HOURS);
 
     // 인기 상품 랭킹 업데이트
-    redisTemplate.opsForZSet().incrementScore(TOP_PRODUCTS_KEY, productId.toString(), 1);
+    redisTemplate.opsForZSet().incrementScore(TOP_PRODUCTS_KEY, product.getName(), 1);
   }
 
   // 조회수 가져오기
@@ -46,7 +55,7 @@ public class ProductServiceV2 {
   // 조회수 랭킹 가져오기
   public Set<String> getTopRankedProducts(int limit) {
     return redisTemplate.opsForZSet()
-        .reverseRange(TOP_PRODUCTS_KEY, 0, limit - 1);
+        .reverseRange(TOP_PRODUCTS_KEY, 0, limit -1);
   }
 
   // 자정에 조회수 리셋
