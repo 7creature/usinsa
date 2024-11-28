@@ -1,4 +1,5 @@
 package com.sparta.usinsa.SearchTest;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -6,8 +7,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sparta.usinsa.application.service.PopularKeywordService;
-import com.sparta.usinsa.application.service.ProductService;
 import com.sparta.usinsa.application.service.SearchService;
 import com.sparta.usinsa.domain.entity.Keywords;
 import com.sparta.usinsa.domain.entity.Product;
@@ -15,7 +14,7 @@ import com.sparta.usinsa.domain.entity.User;
 import com.sparta.usinsa.domain.repository.KeywordRepository;
 import com.sparta.usinsa.domain.repository.ProductRepository;
 import com.sparta.usinsa.presentation.auth.UserType;
-import com.sparta.usinsa.presentation.search.dto.response.SearchResponse;
+import com.sparta.usinsa.presentation.search.dto.response.KeywordResponse;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -94,7 +93,7 @@ public class SearchServiceTest {
 
   @Test
   @DisplayName("인기 키워드 생성 기능 테스트")
-  void popularSearchTest_success() {
+  void popularCreateTest_success() {
     // given
     String keyword = "testKeyword";
     Keywords existingKeyword = new Keywords(keyword, 10L);
