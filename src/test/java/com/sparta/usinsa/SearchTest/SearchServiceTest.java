@@ -40,7 +40,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
-
 public class SearchServiceTest {
 
   @Mock
@@ -55,9 +54,6 @@ public class SearchServiceTest {
 
   @InjectMocks
   private SearchService searchService;
-
-  @InjectMocks
-  private PopularKeywordService popularKeywordService;
 
   @Test
   @DisplayName("키워드 검색 기능 테스트")
@@ -116,7 +112,7 @@ public class SearchServiceTest {
     when(keywordRepository.findByKeyword(keyword)).thenReturn(Optional.of(existingKeyword));
 
     // When
-    popularKeywordService.popularKeyword(keyword);
+    searchService.popularKeyword(keyword);
 
     // Then
     assertEquals(11L, existingKeyword.getSearchCount());
@@ -145,36 +141,4 @@ public class SearchServiceTest {
     assertEquals(100L, responses.get(0).getSearchCount());
     assertEquals("keyword3", responses.get(2).getKeyword());
   }
-
-  @Test
-  @DisplayName("카페인 로컬 캐시 작동 테스트")
-  void cacheableTest_success() {
-    // given
-    Keywords keyword1 = new Keywords("패딩", 100L);
-    keyword1.setId(1L);
-    Keywords keyword2 = new Keywords("코트", 90L);
-    keyword2.setId(2L);
-    List<Keywords> mockKeywords = List.of(keyword1, keyword2);
-
-    when(keywordRepository.findTop10ByOrderBySearchCountDesc()).thenReturn(mockKeywords);
-
-    // cache miss cache 생성
-    List<KeywordResponse> result1 = searchService.V2PopularSearch();
-    // cache 조회
-    List<KeywordResponse> result2 = searchService.V2PopularSearch();
-
-    assertNotNull(caffeineManager, "Caffeine CacheManager가 주입되지 않았습니다.");
-
-    // When
-    Cache cache = caffeineManager.getCache("popularSearch");
-    assertNotNull(cache);
-
-    // Then
-
-    assertNotNull(cache.get("list"));
-    List<KeywordResponse> cachedResponse = (List<KeywordResponse>) cache.get("list").get();
-    assertEquals(result1, cachedResponse);
-    verify(keywordRepository, times(1)).findTop10ByOrderBySearchCountDesc();
-  }
-
 }

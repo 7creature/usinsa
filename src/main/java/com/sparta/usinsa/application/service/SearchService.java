@@ -8,16 +8,11 @@ import com.sparta.usinsa.presentation.search.dto.response.KeywordResponse;
 import com.sparta.usinsa.presentation.search.dto.response.SearchResponse;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,8 +40,12 @@ public class SearchService {
 
     popularKeyword(keyword);
 
-    return products.map(product -> new SearchResponse(product.getId(), product.getUser().getBrand(),
-        product.getName(), product.getPrice()));
+    return products
+        .map(product -> new SearchResponse(
+            product.getId(),
+            product.getUser().getBrand(),
+            product.getName(),
+            product.getPrice()));
   }
 
   public List<KeywordResponse> V1PopularSearch() {
