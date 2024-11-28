@@ -19,14 +19,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtHelper {
 
+
   private final long accessTokenExpiration = 1000L * 60 * 30;
   private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7;
-
   private final SecretKey secretKey;
   private final UserRepository userRepository;
 
-  // 생성자 주입
-  public JwtHelper(UserRepository userRepository) {
+  public JwtHelper(UserRepository userRepository)
+  {
     this.userRepository = userRepository;
     this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
   }
@@ -92,8 +92,8 @@ public class JwtHelper {
   public void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
     Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
     refreshTokenCookie.setHttpOnly(true);
-    refreshTokenCookie.setSecure(true);  // HTTPS를 사용하는 경우
-    refreshTokenCookie.setMaxAge((int) (refreshTokenExpiration / 1000)); // 쿠키 만료 시간 설정
+    refreshTokenCookie.setSecure(true);
+    refreshTokenCookie.setMaxAge((int) (refreshTokenExpiration / 1000));
     refreshTokenCookie.setPath("/");
     response.addCookie(refreshTokenCookie);
   }

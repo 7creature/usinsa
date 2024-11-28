@@ -5,6 +5,8 @@ import com.sparta.usinsa.presentation.common.annotation.AuthUser;
 import com.sparta.usinsa.presentation.common.config.jwt.JwtHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
+import com.sparta.usinsa.presentation.common.config.security.UserPrincipal;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
@@ -39,4 +41,7 @@ public class AuthUserResolver implements HandlerMethodArgumentResolver {
     return jwtHelper.getUserIdFromToken(token);
   }
 
+
+    throw new IllegalStateException("인증 정보가 존재하지 않거나 올바르지 않습니다.");
+  }
 }
