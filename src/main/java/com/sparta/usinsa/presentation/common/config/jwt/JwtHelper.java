@@ -18,9 +18,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtHelper {
 
-  private final SecretKey secretKey;
   private final long accessTokenExpiration = 1000L * 60 * 30;
   private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7;
+  private final SecretKey secretKey;
   private final UserRepository userRepository;
 
   public JwtHelper(UserRepository userRepository)

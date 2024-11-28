@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
+
 @Getter
 @NoArgsConstructor
 public class AuthSignUpRequestDto {
