@@ -1,6 +1,8 @@
 package com.sparta.usinsa.presentation.common.config.security;
 
 import com.sparta.usinsa.presentation.common.config.filter.JwtAuthenticationFilter;
+import io.jsonwebtoken.security.Keys;
+import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,13 +25,21 @@ public class WebSecurityConfig {
   }
 
   @Bean
+  public SecretKey secretKey() {
+    return Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256);
+  }
+
+  @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())  // 버전업으로 인한 csrf() 설정을 람다 방식으로 변경
-        .authorizeHttpRequests(authz -> authz
+        .authorizeHttpRequests(auth -> auth
             .requestMatchers("/auth/signup", "/auth/signin", "/auth/refresh").permitAll()
             .requestMatchers("/api/products/**").hasRole("OWNER")
             .anyRequest().authenticated())
+        .formLogin(form -> form
+            .loginPage("/auth/signin")
+            .permitAll())
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

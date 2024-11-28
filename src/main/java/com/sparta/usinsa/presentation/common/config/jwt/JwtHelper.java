@@ -3,27 +3,29 @@ package com.sparta.usinsa.presentation.common.config.jwt;
 import com.sparta.usinsa.domain.entity.User;
 import com.sparta.usinsa.domain.repository.UserRepository;
 import com.sparta.usinsa.presentation.common.exception.CustomException;
-import io.jsonwebtoken.*;
-import org.springframework.beans.factory.annotation.Value;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Date;
+import javax.crypto.SecretKey;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtHelper {
 
-  @Value("${jwt.secret.key}")
-  private String secretKey;
-
+  private final SecretKey secretKey;
   private final long accessTokenExpiration = 1000L * 60 * 30;
   private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7;
-
   private final UserRepository userRepository;
 
-  public JwtHelper(UserRepository userRepository) {
+  public JwtHelper(UserRepository userRepository, SecretKey secretKey)
+  {
     this.userRepository = userRepository;
+    this.secretKey = secretKey;
   }
 
   public String createAccessToken(User user) {
