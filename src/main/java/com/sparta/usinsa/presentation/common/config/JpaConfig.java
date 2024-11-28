@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableJpaRepositories(basePackages = "com.sparta.usinsa.domain.repository")
-@EnableTransactionManagement // 트랜잭션 관리 활성화
+@EnableTransactionManagement
 @EnableJpaAuditing
 public class JpaConfig {
 
@@ -24,7 +24,7 @@ public class JpaConfig {
   public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
     LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
     factoryBean.setDataSource(dataSource);
-    factoryBean.setPackagesToScan("com.sparta.usinsa.domain.entity");  // 엔티티 클래스가 있는 패키지 설정
+    factoryBean.setPackagesToScan("com.sparta.usinsa.domain.entity");
     factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
     factoryBean.setJpaProperties(hibernateProperties());
     return factoryBean;
@@ -37,11 +37,11 @@ public class JpaConfig {
 
   private Properties hibernateProperties() {
     Properties properties = new Properties();
-    properties.put("hibernate.hbm2ddl.auto", "update");  // DDL 자동 처리 방식 (create, update, validate 등)
-    properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");  // 사용하는 DB에 맞는 dialect 설정
-    properties.put("hibernate.show_sql", "true");  // 쿼리 출력
-    properties.put("hibernate.format_sql", "true");  // 쿼리 포맷팅
-    properties.put("hibernate.use_sql_comments", "true");  // 쿼리에 대한 설명 출력
+    properties.put("hibernate.hbm2ddl.auto", "update");  // DDL 자동 처리 방식
+    properties.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
+    properties.put("hibernate.show_sql", "true");
+    properties.put("hibernate.format_sql", "true");
+    properties.put("hibernate.use_sql_comments", "true");
     return properties;
   }
 }
