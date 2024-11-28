@@ -11,14 +11,12 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Date;
-import java.util.Optional;
 import javax.crypto.SecretKey;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtHelper {
-
 
   private final long accessTokenExpiration = 1000L * 60 * 30;
   private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7;
@@ -58,23 +56,12 @@ public class JwtHelper {
     return createAccessToken(user);
   }
 
-  public Claims getClaims(String token) {
-    if (token.startsWith("Bearer ")) {
-      token = token.substring(7);
-    }
+  public Claims getUserInfoFromToken(String token) {
     return Jwts.parserBuilder()
         .setSigningKey(secretKey)
         .build()
         .parseClaimsJws(token)
         .getBody();
-  }
-
-  public User getUserIdFromToken(String token) {
-    Claims claims = getClaims(token);
-    String sub = claims.getSubject();
-    Long userId = Long.parseLong(sub);
-    Optional<User> byId = userRepository.findById(userId);
-    return byId.get();
   }
 
   public Claims validate(String token) {

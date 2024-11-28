@@ -2,26 +2,21 @@ package com.sparta.usinsa.presentation.auth;
 
 import com.sparta.usinsa.domain.entity.User;
 import com.sparta.usinsa.presentation.common.annotation.AuthUser;
-import com.sparta.usinsa.presentation.common.config.jwt.JwtHelper;
-import jakarta.servlet.http.HttpServletRequest;
-import java.util.Objects;
 import com.sparta.usinsa.presentation.common.config.security.UserPrincipal;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-
 @Component
 @RequiredArgsConstructor
 public class AuthUserResolver implements HandlerMethodArgumentResolver {
-
-  private final JwtHelper jwtHelper;
 
   @Override
   public boolean supportsParameter(MethodParameter parameter) {
@@ -33,14 +28,8 @@ public class AuthUserResolver implements HandlerMethodArgumentResolver {
   @Override
   public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
       NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-    final HttpServletRequest httpServletRequest = webRequest.getNativeRequest(
-        HttpServletRequest.class);
 
-    final String token = Objects.requireNonNull(httpServletRequest)
-        .getHeader(HttpHeaders.AUTHORIZATION);
-    return jwtHelper.getUserIdFromToken(token);
-  }
-
+    Optional<Authentication> authentication = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
 
     throw new IllegalStateException("인증 정보가 존재하지 않거나 올바르지 않습니다.");
   }

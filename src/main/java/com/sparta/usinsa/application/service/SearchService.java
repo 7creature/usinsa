@@ -29,6 +29,7 @@ public class SearchService {
   private final ProductRepository productRepository;
   private final KeywordRepository keywordRepository;
 
+
   private final RedisTemplate<String, Object> redisTemplate;
 
   private static final String SEARCH_KEY = "popular:search";
@@ -61,6 +62,8 @@ public class SearchService {
             keyword.getSearchCount(), keyword.getLastSearched())).toList();
   }
 
+
+
   public void deleteSearch(Long id) {
     Optional<Keywords> keyword = keywordRepository.findById(id);
     if (keyword.isPresent()) {
@@ -69,7 +72,7 @@ public class SearchService {
 
   }
 
-  @Cacheable(value = SEARCH_KEY, key="'poplarSerchList'")
+  @Cacheable(value = SEARCH_KEY)
   public List<KeywordResponse> V2PopularSearch() {
     ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
 

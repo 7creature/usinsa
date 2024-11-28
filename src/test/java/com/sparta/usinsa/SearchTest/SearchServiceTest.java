@@ -24,9 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -44,10 +42,6 @@ public class SearchServiceTest {
 
   @Mock
   private KeywordRepository keywordRepository;
-
-  @Mock
-  @Qualifier("caffeineManager")
-  private CacheManager caffeineManager;
 
   @InjectMocks
   private SearchService searchService;
