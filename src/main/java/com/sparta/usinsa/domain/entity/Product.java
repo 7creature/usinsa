@@ -7,62 +7,64 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends TimeStamped {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  private String name;
-  private Long price;
-  private String description;
-  private String productUrl;
-  private String category;
+    private String name;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  private User user;
+    private Long price;
 
-  protected Product() {
-  }
+    private String description;
 
-  public Product(
-      String name,
-      Long price,
-      String description,
-      String productUrl,
-      String category,
-      User user) {
+    private String productUrl;
 
-    this.name = name;
-    this.price = price;
-    this.description = description;
-    this.productUrl = productUrl;
-    this.category = category;
-    this.user = user;
-  }
+    private String category;
 
-  // 상품 수정 메서드
-  public Product update(
-      String name,
-      Long price,
-      String description,
-      String productUrl,
-      String category,
-      User user) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    this.name = name;
-    this.price = price;
-    this.description = description;
-    this.productUrl = productUrl;
-    this.category = category;
-    this.user = user;
+    public Product(
+            String name,
+            Long price,
+            String description,
+            String productUrl,
+            String category,
+            User user
+    ) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
+        this.productUrl = productUrl;
+        this.category = category;
+        this.user = user;
+    }
 
-    return this;
-  }
-
+    // 상품 수정 메서드
+    public Product update(
+            String name,
+            Long price,
+            String description,
+            String productUrl,
+            String category,
+            User user
+    ) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
+        this.productUrl = productUrl;
+        this.category = category;
+        this.user = user;
+        return this;
+    }
 }

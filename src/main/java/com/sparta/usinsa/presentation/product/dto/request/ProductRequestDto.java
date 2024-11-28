@@ -20,12 +20,10 @@ public class ProductRequestDto {
       String productUrl,
       String category
   ) {
-
     this.name = name;
     this.price = price;
     this.description = description;
     this.productUrl = productUrl;
     this.category = category;
   }
-
 }
