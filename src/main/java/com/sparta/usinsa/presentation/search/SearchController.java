@@ -46,12 +46,4 @@ public class SearchController {
         .body(searchService.V2PopularSearch());
   }
 
-  @DeleteMapping("/delet/{id}")
-  public ResponseEntity<Void> delete(@PathVariable Long id) {
-    searchService.deleteSearch(id);
-    return ResponseEntity
-        .status(HttpStatus.NOT_FOUND)
-        .build();
-  }
-
 }

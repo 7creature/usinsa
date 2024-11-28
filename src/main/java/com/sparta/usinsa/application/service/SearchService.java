@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,7 +29,6 @@ public class SearchService {
 
   private final ProductRepository productRepository;
   private final KeywordRepository keywordRepository;
-
 
   private final RedisTemplate<String, Object> redisTemplate;
 
@@ -62,23 +62,13 @@ public class SearchService {
             keyword.getSearchCount(), keyword.getLastSearched())).toList();
   }
 
-
-
-  public void deleteSearch(Long id) {
-    Optional<Keywords> keyword = keywordRepository.findById(id);
-    if (keyword.isPresent()) {
-      keywordRepository.deleteById(id);
-    }
-
-  }
-
   @Cacheable(value = SEARCH_KEY)
   public List<KeywordResponse> V2PopularSearch() {
     ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
 
     Set<Object> popularKeyword = zSetOperations.reverseRange(SEARCH_KEY, 0, 9);
 
-    if (popularKeyword.isEmpty() || popularKeyword == null) {
+    if ( popularKeyword == null || popularKeyword.isEmpty()) {
       List<Keywords> keywords = keywordRepository.findTop10ByOrderBySearchCountDesc();
 
       return keywords.stream().map(
