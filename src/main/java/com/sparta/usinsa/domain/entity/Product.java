@@ -38,9 +38,6 @@ public class Product extends TimeStamped {
     this.viewCount += increaseViewCount;
   }
 
-  protected Product() {
-  }
-
   public Product(
       String name,
       Long price,
