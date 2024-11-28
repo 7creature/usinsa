@@ -4,8 +4,10 @@ import com.sparta.usinsa.domain.entity.Keywords;
 import com.sparta.usinsa.domain.entity.Product;
 import com.sparta.usinsa.domain.repository.KeywordRepository;
 import com.sparta.usinsa.domain.repository.ProductRepository;
+import com.sparta.usinsa.presentation.search.dto.response.KeywordResponse;
 import com.sparta.usinsa.presentation.search.dto.response.SearchResponse;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SearchService {
 
-  private final ProductRepository productRepository;
-  private final KeywordRepository keywordRepository;
+  private ProductRepository productRepository;
+  private KeywordRepository keywordRepository;
 
   @Transactional
   public Page<SearchResponse> searches(int page, int size, String keyword) {
@@ -31,7 +33,7 @@ public class SearchService {
       products = productRepository.findAllByCategory(pageable, keyword);
     }
 
-   popularKeyword(keyword);
+    popularKeyword(keyword);
 
     return products
         .map(product -> new SearchResponse(
@@ -41,6 +43,18 @@ public class SearchService {
             product.getPrice()));
   }
 
+  public List<KeywordResponse> popularSearch() {
+    List<Keywords> keywords = keywordRepository.findTop10ByOrderBySearchCountDesc();
+
+    return keywords
+        .stream()
+        .map(keyword -> new KeywordResponse(
+        keyword.getId(),
+        keyword.getKeyword(),
+        keyword.getSearchCount(),
+        keyword.getLastSearched()))
+        .toList();
+  }
   @Transactional
   public void popularKeyword(String keyword) {
     Optional<Keywords> optionalKeyword = keywordRepository.findByKeyword(keyword);

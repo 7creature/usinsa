@@ -1,4 +1,5 @@
 package com.sparta.usinsa.SearchTest;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -13,6 +14,7 @@ import com.sparta.usinsa.domain.entity.User;
 import com.sparta.usinsa.domain.repository.KeywordRepository;
 import com.sparta.usinsa.domain.repository.ProductRepository;
 import com.sparta.usinsa.presentation.auth.UserType;
+import com.sparta.usinsa.presentation.search.dto.response.KeywordResponse;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -91,7 +93,7 @@ public class SearchServiceTest {
 
   @Test
   @DisplayName("인기 키워드 생성 기능 테스트")
-  void popularSearchTest_success() {
+  void popularCreateTest_success() {
     // given
     String keyword = "testKeyword";
     Keywords existingKeyword = new Keywords(keyword, 10L);
@@ -110,4 +112,24 @@ public class SearchServiceTest {
     verify(keywordRepository, times(1)).findByKeyword(keyword);
   }
 
+  @Test
+  @DisplayName("인기 키워드 조회 기능 테스트")
+  void popularSearchTest_success() {
+    // given
+    List<Keywords> mockKeywords = List.of(
+        new Keywords("keyword1", 100L),
+        new Keywords("keyword2", 80L),
+        new Keywords("keyword3", 60L)
+    );
+    when(keywordRepository.findTop10ByOrderBySearchCountDesc()).thenReturn(mockKeywords);
+
+    // When
+    List<KeywordResponse> responses = searchService.popularSearch();
+
+    // Then
+    assertEquals(3, responses.size());
+    assertEquals("keyword1", responses.get(0).getKeyword());
+    assertEquals(100L, responses.get(0).getSearchCount());
+    assertEquals("keyword3", responses.get(2).getKeyword());
+  }
 }
