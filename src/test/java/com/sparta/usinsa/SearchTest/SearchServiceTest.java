@@ -24,7 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -42,6 +44,10 @@ public class SearchServiceTest {
 
   @Mock
   private KeywordRepository keywordRepository;
+
+  @Mock
+  @Qualifier("caffeineManager")
+  private CacheManager caffeineManager;
 
   @InjectMocks
   private SearchService searchService;
@@ -63,7 +69,7 @@ public class SearchServiceTest {
         .build();
 
     Product product = new Product(
-        user, "따듯한 패딩", 1000L, "따숩다", "test", "패딩");
+         "따듯한 패딩", 1000L, "따숩다", "test", "패딩",user);
 
     Field idField = Product.class.getDeclaredField("id");
     idField.setAccessible(true);
@@ -124,7 +130,7 @@ public class SearchServiceTest {
     when(keywordRepository.findTop10ByOrderBySearchCountDesc()).thenReturn(mockKeywords);
 
     // When
-    List<KeywordResponse> responses = searchService.popularSearch();
+    List<KeywordResponse> responses = searchService.V1PopularSearch();
 
     // Then
     assertEquals(3, responses.size());
