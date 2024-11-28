@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+
 @Getter
 @NoArgsConstructor
 public class AuthSignUpRequestDto {
@@ -36,7 +37,8 @@ public class AuthSignUpRequestDto {
   private String brand;
 
   @Builder
-  public AuthSignUpRequestDto(String email, String password, String name, String type, String brand) {
+  public AuthSignUpRequestDto(String email, String password, String name, String type,
+      String brand) {
     this.email = email;
     this.password = password;
     this.name = name;

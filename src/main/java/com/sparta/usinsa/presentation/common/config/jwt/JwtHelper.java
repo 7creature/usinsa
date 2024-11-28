@@ -1,28 +1,32 @@
 package com.sparta.usinsa.presentation.common.config.jwt;
 
 import com.sparta.usinsa.domain.entity.User;
-import com.sparta.usinsa.presentation.common.exception.CustomException;
 import com.sparta.usinsa.domain.repository.UserRepository;
-import io.jsonwebtoken.*;
-import java.util.Base64;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
+import com.sparta.usinsa.presentation.common.exception.CustomException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Date;
+import javax.crypto.SecretKey;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtHelper {
 
-  private final String secretKey = "omj5JRxN5jN3NgELiMGihnSSyfEOeYgnxZY11YWHPqHb6/Lf/6VYB9VMhb7Tia2q4eyNWUNiCf8ZMSGRg==";
+  private final SecretKey secretKey;
   private final long accessTokenExpiration = 1000L * 60 * 30;
   private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7;
-
   private final UserRepository userRepository;
 
-  // 생성자 주입
-  public JwtHelper(UserRepository userRepository) {
+  public JwtHelper(UserRepository userRepository)
+  {
     this.userRepository = userRepository;
+    this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
   }
 
   public String createAccessToken(User user) {
@@ -75,8 +79,8 @@ public class JwtHelper {
   public void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
     Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
     refreshTokenCookie.setHttpOnly(true);
-    refreshTokenCookie.setSecure(true);  // HTTPS를 사용하는 경우
-    refreshTokenCookie.setMaxAge((int) (refreshTokenExpiration / 1000)); // 쿠키 만료 시간 설정
+    refreshTokenCookie.setSecure(true);
+    refreshTokenCookie.setMaxAge((int) (refreshTokenExpiration / 1000));
     refreshTokenCookie.setPath("/");
     response.addCookie(refreshTokenCookie);
   }
