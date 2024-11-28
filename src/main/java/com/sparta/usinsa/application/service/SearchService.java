@@ -4,8 +4,10 @@ import com.sparta.usinsa.domain.entity.Keywords;
 import com.sparta.usinsa.domain.entity.Product;
 import com.sparta.usinsa.domain.repository.KeywordRepository;
 import com.sparta.usinsa.domain.repository.ProductRepository;
+import com.sparta.usinsa.presentation.search.dto.response.KeywordResponse;
 import com.sparta.usinsa.presentation.search.dto.response.SearchResponse;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,8 +23,7 @@ public class SearchService {
   private ProductRepository productRepository;
   private KeywordRepository keywordRepository;
 
-  private PopularKeywordService popularKeywordService;
-
+  @Transactional
   public Page<SearchResponse> searches(int page, int size, String keyword) {
     Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -32,7 +33,7 @@ public class SearchService {
       products = productRepository.findAllByCategory(pageable, keyword);
     }
 
-    popularKeywordService.popularKeyword(keyword);
+    popularKeyword(keyword);
 
     return products
         .map(product -> new SearchResponse(
