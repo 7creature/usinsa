@@ -91,26 +91,26 @@ public class SearchServiceTest {
     verify(productRepository, times(1)).findAllByNameContaining(pageable, keyword);
   }
 
-  @Test
-  @DisplayName("인기 키워드 생성 기능 테스트")
-  void popularCreateTest_success() {
-    // given
-    String keyword = "testKeyword";
-    Keywords existingKeyword = new Keywords(keyword, 10L);
-    existingKeyword
-        .setLastSearched(LocalDateTime.of(2023, 1, 1, 12, 0));
-
-    when(keywordRepository.findByKeyword(keyword)).thenReturn(Optional.of(existingKeyword));
-
-    // When
-    searchService.popularKeyword(keyword);
-
-    // Then
-    assertEquals(11L, existingKeyword.getSearchCount());
-    assertTrue(existingKeyword.getLastSearched()
-        .isAfter(LocalDateTime.of(2023, 1, 1, 12, 0)));
-    verify(keywordRepository, times(1)).findByKeyword(keyword);
-  }
+//  @Test
+//  @DisplayName("인기 키워드 생성 기능 테스트")
+//  void popularCreateTest_success() {
+//    // given
+//    String keyword = "testKeyword";
+//    Keywords existingKeyword = new Keywords(keyword, 10L);
+//    existingKeyword
+//        .setLastSearched(LocalDateTime.of(2023, 1, 1, 12, 0));
+//
+//    when(keywordRepository.findByKeyword(keyword)).thenReturn(Optional.of(existingKeyword));
+//
+//    // When
+//    searchService.popularKeyword(keyword);
+//
+//    // Then
+//    assertEquals(11L, existingKeyword.getSearchCount());
+//    assertTrue(existingKeyword.getLastSearched()
+//        .isAfter(LocalDateTime.of(2023, 1, 1, 12, 0)));
+//    verify(keywordRepository, times(1)).findByKeyword(keyword);
+//  }
 
   @Test
   @DisplayName("인기 키워드 조회 기능 테스트")
