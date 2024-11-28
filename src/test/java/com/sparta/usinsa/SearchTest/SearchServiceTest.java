@@ -15,7 +15,6 @@ import com.sparta.usinsa.domain.entity.User;
 import com.sparta.usinsa.domain.repository.KeywordRepository;
 import com.sparta.usinsa.domain.repository.ProductRepository;
 import com.sparta.usinsa.presentation.auth.UserType;
-import com.sparta.usinsa.presentation.search.dto.response.KeywordResponse;
 import com.sparta.usinsa.presentation.search.dto.response.SearchResponse;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -37,7 +36,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
-
 public class SearchServiceTest {
 
   @Mock
@@ -48,9 +46,6 @@ public class SearchServiceTest {
 
   @InjectMocks
   private SearchService searchService;
-
-  @InjectMocks
-  private PopularKeywordService popularKeywordService;
 
   @Test
   @DisplayName("키워드 검색 기능 테스트")
@@ -99,7 +94,7 @@ public class SearchServiceTest {
 
   @Test
   @DisplayName("인기 키워드 생성 기능 테스트")
-  void popularCreateTest_success() {
+  void popularSearchTest_success() {
     // given
     String keyword = "testKeyword";
     Keywords existingKeyword = new Keywords(keyword, 10L);
@@ -109,7 +104,7 @@ public class SearchServiceTest {
     when(keywordRepository.findByKeyword(keyword)).thenReturn(Optional.of(existingKeyword));
 
     // When
-    popularKeywordService.popularKeyword(keyword);
+    searchService.popularKeyword(keyword);
 
     // Then
     assertEquals(11L, existingKeyword.getSearchCount());
