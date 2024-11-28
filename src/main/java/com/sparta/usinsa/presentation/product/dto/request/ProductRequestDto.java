@@ -1,8 +1,10 @@
 package com.sparta.usinsa.presentation.product.dto.request;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class ProductRequestDto {
 
   private String name;
@@ -10,9 +12,6 @@ public class ProductRequestDto {
   private String description;
   private String productUrl;
   private String category;
-
-  public ProductRequestDto() {
-  }
 
   public ProductRequestDto(
       String name,

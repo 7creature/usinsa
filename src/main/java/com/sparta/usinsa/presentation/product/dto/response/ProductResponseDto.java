@@ -4,7 +4,11 @@ import com.sparta.usinsa.domain.entity.Product;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
 public class ProductResponseDto {
 
   private Long id;
@@ -13,6 +17,7 @@ public class ProductResponseDto {
   private String description;
   private String productUrl;
   private String category;
+  @Getter
   private LocalDateTime createdAt;
   private LocalDateTime modifiedAt;
 
@@ -28,33 +33,6 @@ public class ProductResponseDto {
     this.modifiedAt = product.getModifiedAt();
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public Long getPrice() {
-    return price;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public String getProductUrl() {
-    return productUrl;
-  }
-
-  public String getCategory() {
-    return category;
-  }
-
-  public LocalDateTime getCreatedAt() {
-    return createdAt;
-  }
 
   public LocalDateTime getModifiedAt() {
     return modifiedAt;
