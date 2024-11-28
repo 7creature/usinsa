@@ -3,6 +3,7 @@ package com.sparta.usinsa.presentation.auth.dto.request;
 
 import com.sparta.usinsa.domain.entity.User;
 import com.sparta.usinsa.presentation.auth.UserType;
+import com.sparta.usinsa.presentation.common.PasswordEncoder;
 import com.sparta.usinsa.presentation.common.annotation.ValidEnum;
 import com.sparta.usinsa.presentation.common.annotation.ValidPasswordPatten;
 import jakarta.validation.constraints.Email;
@@ -11,7 +12,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 @Getter
 @NoArgsConstructor
@@ -36,7 +37,8 @@ public class AuthSignUpRequestDto {
   private String brand;
 
   @Builder
-  public AuthSignUpRequestDto(String email, String password, String name, String type, String brand) {
+  public AuthSignUpRequestDto(String email, String password, String name, String type,
+      String brand) {
     this.email = email;
     this.password = password;
     this.name = name;
