@@ -18,11 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SearchService {
 
-  private ProductRepository productRepository;
-  private KeywordRepository keywordRepository;
+  private final ProductRepository productRepository;
+  private final KeywordRepository keywordRepository;
 
-  private PopularKeywordService popularKeywordService;
-
+  @Transactional
   public Page<SearchResponse> searches(int page, int size, String keyword) {
     Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -32,7 +31,7 @@ public class SearchService {
       products = productRepository.findAllByCategory(pageable, keyword);
     }
 
-    popularKeywordService.popularKeyword(keyword);
+   popularKeyword(keyword);
 
     return products
         .map(product -> new SearchResponse(
@@ -42,4 +41,19 @@ public class SearchService {
             product.getPrice()));
   }
 
+  @Transactional
+  public void popularKeyword(String keyword) {
+    Optional<Keywords> optionalKeyword = keywordRepository.findByKeyword(keyword);
+    // Optional Wrapper 클레스로 null값 입력 방지
+
+    if (optionalKeyword.isPresent()) { // isPresent()으로 null값인지 확인
+      Keywords keywords = optionalKeyword.get();
+      keywords.setSearchCount(keywords.getSearchCount() + 1); // 중복된 키워드 카운트
+      keywords.setLastSearched(LocalDateTime.now());
+    }else { // null이면 생성
+      Keywords newKeyword = new Keywords(keyword, 1L);
+      newKeyword.setLastSearched(LocalDateTime.now());
+      keywordRepository.save(newKeyword);
+    }
+  }
 }
