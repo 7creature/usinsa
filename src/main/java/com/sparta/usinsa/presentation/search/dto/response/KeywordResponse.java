@@ -1,5 +1,6 @@
 package com.sparta.usinsa.presentation.search.dto.response;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class KeywordResponse {
+public class KeywordResponse implements Serializable {
   private Long id;
   private String keyword;
   private Long searchCount;
