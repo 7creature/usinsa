@@ -11,6 +11,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.Optional;
 import javax.crypto.SecretKey;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -18,9 +19,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtHelper {
 
-  private final SecretKey secretKey;
+
   private final long accessTokenExpiration = 1000L * 60 * 30;
   private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7;
+  private final SecretKey secretKey;
   private final UserRepository userRepository;
 
   public JwtHelper(UserRepository userRepository)
@@ -56,12 +58,23 @@ public class JwtHelper {
     return createAccessToken(user);
   }
 
-  public Claims getUserInfoFromToken(String token) {
+  public Claims getClaims(String token) {
+    if (token.startsWith("Bearer ")) {
+      token = token.substring(7);
+    }
     return Jwts.parserBuilder()
         .setSigningKey(secretKey)
         .build()
         .parseClaimsJws(token)
         .getBody();
+  }
+
+  public User getUserIdFromToken(String token) {
+    Claims claims = getClaims(token);
+    String sub = claims.getSubject();
+    Long userId = Long.parseLong(sub);
+    Optional<User> byId = userRepository.findById(userId);
+    return byId.get();
   }
 
   public Claims validate(String token) {
