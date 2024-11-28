@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class ViewCountResetScheduler {
 
   private final ProductServiceV2 productServiceV2;
-  
+
 //  @Scheduled(cron = "*/10 * * * * *") // 10 초마다 실행 -> 테스트
   @Scheduled(cron = "0 0 0 * * *")  // 매일 자정에 실행
   public void resetViewCounts() {
