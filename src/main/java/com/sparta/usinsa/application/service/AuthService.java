@@ -1,18 +1,16 @@
 package com.sparta.usinsa.application.service;
 
-import static com.sparta.usinsa.domain.entity.QUser.user;
-
 import com.sparta.usinsa.domain.entity.User;
 import com.sparta.usinsa.domain.repository.UserRepository;
-import com.sparta.usinsa.presentation.auth.dto.request.AuthSignUpRequestDto;
 import com.sparta.usinsa.presentation.auth.dto.request.AuthSignInRequestDto;
+import com.sparta.usinsa.presentation.auth.dto.request.AuthSignUpRequestDto;
+import com.sparta.usinsa.presentation.common.PasswordEncoder;
 import com.sparta.usinsa.presentation.common.config.jwt.JwtHelper;
 import com.sparta.usinsa.presentation.common.exception.CustomException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 @RequiredArgsConstructor
