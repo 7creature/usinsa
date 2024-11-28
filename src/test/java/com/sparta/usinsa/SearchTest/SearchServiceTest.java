@@ -6,8 +6,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sparta.usinsa.application.service.PopularKeywordService;
-import com.sparta.usinsa.application.service.ProductService;
 import com.sparta.usinsa.application.service.SearchService;
 import com.sparta.usinsa.domain.entity.Keywords;
 import com.sparta.usinsa.domain.entity.Product;
@@ -15,7 +13,6 @@ import com.sparta.usinsa.domain.entity.User;
 import com.sparta.usinsa.domain.repository.KeywordRepository;
 import com.sparta.usinsa.domain.repository.ProductRepository;
 import com.sparta.usinsa.presentation.auth.UserType;
-import com.sparta.usinsa.presentation.search.dto.response.SearchResponse;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,9 +43,6 @@ public class SearchServiceTest {
 
   @InjectMocks
   private SearchService searchService;
-
-  @InjectMocks
-  private PopularKeywordService popularKeywordService;
 
   @Test
   @DisplayName("키워드 검색 기능 테스트")
@@ -107,7 +101,7 @@ public class SearchServiceTest {
     when(keywordRepository.findByKeyword(keyword)).thenReturn(Optional.of(existingKeyword));
 
     // When
-    popularKeywordService.popularKeyword(keyword);
+    searchService.popularKeyword(keyword);
 
     // Then
     assertEquals(11L, existingKeyword.getSearchCount());
