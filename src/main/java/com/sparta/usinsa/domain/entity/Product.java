@@ -8,10 +8,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends TimeStamped {
 
   @Id
@@ -33,9 +36,6 @@ public class Product extends TimeStamped {
 
   public void setIncreaseViewCount(Long increaseViewCount) {
     this.viewCount += increaseViewCount;
-  }
-
-  protected Product() {
   }
 
   public Product(
