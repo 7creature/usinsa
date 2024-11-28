@@ -20,21 +20,28 @@ public class SearchController {
 
   private SearchService searchService;
 
-  @GetMapping("/search/{keyword}")
+  @GetMapping("/search")
   public ResponseEntity<Page<SearchResponse>> search(
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "10") int size,
-      @RequestParam String keyword) {
+      @RequestParam(required = false) String keyword) {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(searchService.searches(page,size,keyword));
   }
 
-  @GetMapping("/search")
-  public ResponseEntity<List<KeywordResponse>> popularSearch(){
+  @GetMapping("/V1/search")
+  public ResponseEntity<List<KeywordResponse>> V1PopularSearch(){
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(searchService.popularSearch());
+        .body(searchService.V1PopularSearch());
+  }
+
+  @GetMapping("/V2/search")
+  public ResponseEntity<List<KeywordResponse>> V2PopularSearch(){
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(searchService.V2PopularSearch());
   }
 
 }
