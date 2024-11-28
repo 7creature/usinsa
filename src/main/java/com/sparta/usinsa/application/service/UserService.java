@@ -7,7 +7,6 @@ import com.sparta.usinsa.presentation.user.dto.request.UserUpdateRequestDto;
 import com.sparta.usinsa.presentation.user.dto.response.UserResponseDto;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +23,7 @@ public class UserService {
     return userRepository.findAll().stream()
         .filter(user -> !user.isDeleted())
         .map(UserResponseDto::new)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   @Transactional
@@ -32,10 +31,8 @@ public class UserService {
     if (!passwordEncoder.matches(userUpdateRequestDto.getCurrentPassword(), user.getPassword())) {
       throw new CustomException("현재 비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
     }
-
     user.updateName(userUpdateRequestDto.getName());
     user.updatePassword(passwordEncoder.encode(userUpdateRequestDto.getNewPassword()));
-    userRepository.save(user);
     return new UserResponseDto(user);
   }
 
