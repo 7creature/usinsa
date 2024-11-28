@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Date;
@@ -22,10 +23,10 @@ public class JwtHelper {
   private final long refreshTokenExpiration = 1000L * 60 * 60 * 24 * 7;
   private final UserRepository userRepository;
 
-  public JwtHelper(UserRepository userRepository, SecretKey secretKey)
+  public JwtHelper(UserRepository userRepository)
   {
     this.userRepository = userRepository;
-    this.secretKey = secretKey;
+    this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
   }
 
   public String createAccessToken(User user) {

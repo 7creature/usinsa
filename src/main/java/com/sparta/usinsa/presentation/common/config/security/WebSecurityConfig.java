@@ -29,6 +29,7 @@ public class WebSecurityConfig {
     return Keys.secretKeyFor(io.jsonwebtoken.SignatureAlgorithm.HS256);
   }
 
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
@@ -37,9 +38,7 @@ public class WebSecurityConfig {
             .requestMatchers("/auth/signup", "/auth/signin", "/auth/refresh").permitAll()
             .requestMatchers("/api/products/**").hasRole("OWNER")
             .anyRequest().authenticated())
-        .formLogin(form -> form
-            .loginPage("/auth/signin")
-            .permitAll())
+        .formLogin(form -> form.disable())
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

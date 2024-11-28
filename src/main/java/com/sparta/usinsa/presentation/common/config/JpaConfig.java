@@ -45,4 +45,3 @@ public class JpaConfig {
     return properties;
   }
 }
-
