@@ -78,7 +78,8 @@ public class ProductServiceV2 {
   //  @Scheduled(cron = "0 0 0 * * *")  // 매일 자정에 실행
   @Scheduled(cron = "*/10 * * * * *") // 10 초마다 실행 -> 테스트
   public void resetViewCounts() {
-    Set<String> keys = redisTemplate.keys(VIEW_COUNT_KEY + "*");
+    Set<String> keys = redisTemplate.keys("product:viewcount:*");
+    keys.forEach(System.out::println);
     if (keys != null && !keys.isEmpty()) {
       redisTemplate.delete(keys);
     }
